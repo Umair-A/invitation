@@ -37,7 +37,13 @@
   html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
   html,body{margin:0;height:100%}
   body{
-    background:var(--ivory);
+    background:
+      radial-gradient(ellipse 120% 70% at 50% 0%, rgba(255,248,230,.85) 0%, rgba(255,248,230,0) 60%),
+      radial-gradient(ellipse 90% 60% at 15% 100%, rgba(214,160,150,.28) 0%, rgba(214,160,150,0) 65%),
+      radial-gradient(ellipse 90% 60% at 85% 100%, rgba(167,124,72,.35) 0%, rgba(167,124,72,0) 65%),
+      linear-gradient(160deg, #f6ead0 0%, #e8d2a6 30%, #d3b27d 60%, #b18a55 100%);
+    background-attachment:fixed;
+    background-color:#d9c39a;
     color:var(--ink);
     font-family:var(--serif);
     font-size:17px;
@@ -56,10 +62,6 @@
     min-height:100%;
     background:var(--paper);
     box-shadow:0 0 0 1px rgba(201,164,76,.18), 0 30px 80px rgba(90,74,51,.18);
-  }
-  @media (min-width:700px){
-    body{background:
-      radial-gradient(ellipse at 50% 20%, #efe2c7 0%, #d9c39a 45%, #b79a6a 100%);}
   }
 
   /* ---------- Envelope ---------- */
