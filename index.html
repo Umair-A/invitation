@@ -358,22 +358,6 @@
   footer{text-align:center;padding:0 26px 64px;background:var(--tan);color:#5f4a2e;font-style:italic;font-size:15px}
   .stage{background:var(--tan)}
 
-  /* Music toggle, as in the video */
-  .music{
-    position:fixed; right:calc(50% - 215px + 18px); bottom:calc(18px + env(safe-area-inset-bottom,0px));
-    width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;z-index:40;
-    background:linear-gradient(to bottom,#dcbf72,var(--gold-deep));
-    box-shadow:0 8px 20px rgba(110,90,50,.3);color:#fff9ec;display:grid;place-items:center;
-    opacity:0;transition:opacity .6s 3.4s;
-  }
-  @media (max-width:700px){.music{right:18px}}
-  body:not(.sealed) .music{opacity:1}
-  .music:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-  .music svg{width:18px;height:18px}
-  .music .pause{display:none}
-  .music.on .play{display:none}
-  .music.on .pause{display:block}
-
   @media (prefers-reduced-motion: reduce){
     *{animation:none!important; transition-duration:.01ms!important}
   }
@@ -489,10 +473,6 @@
     <footer>We look forward to celebrating with you.</footer>
   </main>
 
-  <button class="music" id="music" aria-label="Play soft background music" aria-pressed="false">
-    <svg class="play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-    <svg class="pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-  </button>
 </div>
 
 <script>
@@ -604,45 +584,6 @@
     cards.forEach((c,i)=>setTimeout(()=>c.reveal(), i*220));
   });
 
-  /* ---- Soft ambient music (synthesised, no external audio) ---- */
-  const musicBtn=document.getElementById('music');
-  let ac=null, nodes=[], on=false, melodyTimer=null;
-  const notes=[392,440,523.25,587.33,659.25,783.99]; // G major pentatonic, gentle
-  function startMusic(){
-    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
-    ac.resume();
-    const master=ac.createGain(); master.gain.value=0; master.connect(ac.destination);
-    master.gain.linearRampToValueAtTime(.18, ac.currentTime+2);
-    // warm pad drone
-    [196,293.66].forEach((f,i)=>{
-      const o=ac.createOscillator(); o.type='sine'; o.frequency.value=f;
-      const g=ac.createGain(); g.gain.value=.35-i*.1;
-      o.connect(g).connect(master); o.start(); nodes.push(o);
-    });
-    function pluck(){
-      if(!on) return;
-      const f=notes[Math.floor(Math.random()*notes.length)];
-      const o=ac.createOscillator(); o.type='triangle'; o.frequency.value=f;
-      const g=ac.createGain(); const t=ac.currentTime;
-      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.5,t+.05); g.gain.exponentialRampToValueAtTime(.001,t+2.2);
-      o.connect(g).connect(master); o.start(t); o.stop(t+2.3);
-      melodyTimer=setTimeout(pluck, 900+Math.random()*1400);
-    }
-    pluck();
-    nodes.push(master);
-  }
-  function stopMusic(){
-    clearTimeout(melodyTimer);
-    const master=nodes[nodes.length-1];
-    if(master){ master.gain.linearRampToValueAtTime(0, ac.currentTime+.8); }
-    setTimeout(()=>{ nodes.forEach(n=>{ try{ n.stop ? n.stop() : n.disconnect(); }catch(e){} }); nodes=[]; },900);
-  }
-  musicBtn.addEventListener('click', ()=>{
-    on=!on; musicBtn.classList.toggle('on',on);
-    musicBtn.setAttribute('aria-pressed', on);
-    musicBtn.setAttribute('aria-label', on?'Pause background music':'Play soft background music');
-    on?startMusic():stopMusic();
-  });
 })();
 </script>
 </body>
